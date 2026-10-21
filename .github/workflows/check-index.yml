@@ -1,0 +1,35 @@
+name: Check mod list
+
+on:
+  pull_request:
+    paths:
+      - "index.json"
+      - "previews/**"
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: The pull request's files
+        uses: actions/checkout@v4
+        with:
+          path: pr
+          persist-credentials: false
+      - name: The check script from main (a pull request can't change the rules it is checked by)
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: main
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check the list and download every new or changed mod
+        env:
+          D5MODS_ROOT: ${{ github.workspace }}/pr
+        run: python main/tools/check_index.py --changed main/index.json
