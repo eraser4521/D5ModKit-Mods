@@ -71,6 +71,8 @@ def entry_problems(e):
                 out.append(f"preview {p} is over 1 MB")
             elif os.path.splitext(p)[1].lower() not in (".png", ".jpg", ".jpeg", ".webp"):
                 out.append("preview must be PNG, JPG or WebP")
+    if e.get("github") and not re.match(r"^[A-Za-z0-9-]{1,39}$", str(e["github"])):
+        out.append("github must be a GitHub account name")
     for r in e.get("requires") or []:
         if not UID.match(str(r)):
             out.append(f"requires: {r!r} is not a mod uid")
@@ -148,6 +150,15 @@ def check_download(e):
             pass
 
 
+def pr_author():
+    """the pull request's author (GitHub Actions' event file), or None"""
+    try:
+        with open(os.environ["GITHUB_EVENT_PATH"], encoding="utf-8") as f:
+            return json.load(f)["pull_request"]["user"]["login"]
+    except (KeyError, OSError, ValueError, TypeError):
+        return None
+
+
 def main(argv):
     with open(os.path.join(ROOT, "index.json"), encoding="utf-8") as f:
         idx = json.load(f)
@@ -172,9 +183,28 @@ def main(argv):
                 base = {x.get("uid"): x for x in json.load(f).get("mods", [])}
         except (OSError, ValueError):
             base = {}
+        author = pr_author()
+        owner = (os.environ.get("GITHUB_REPOSITORY_OWNER") or "").lower()
+        now = {x.get("uid") for x in idx["mods"]}
+        if author and author.lower() != owner:
+            for uid, was in base.items():
+                if uid not in now and (was.get("github") or "").lower() != author.lower():
+                    print(f"{was.get('name')}: a post can't take someone else's mod off the list")
+                    bad += 1
         for e in idx["mods"]:
             if base.get(e.get("uid")) == e or entry_problems(e):
                 continue
+            was = base.get(e.get("uid"))
+            if author and author.lower() != owner:
+                who = (e.get("github") or "").lower()
+                if who and who != author.lower():
+                    print(f"{e['name']}: the entry says it was posted by {e['github']}, the pull request is by {author}")
+                    bad += 1
+                    continue
+                if was and was.get("github") and was["github"].lower() != author.lower():
+                    print(f"{e['name']}: only {was['github']} (who posted it) can post its updates")
+                    bad += 1
+                    continue
             print(f"checking {e['name']} v{e['version']} ...")
             probs = check_download(e)
             for p in probs:
