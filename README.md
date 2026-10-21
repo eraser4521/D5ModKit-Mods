@@ -15,28 +15,29 @@ You don't need a GitHub account to browse or install. Open D5 Mod Kit (1.5.7 or 
   match, so a file that was swapped or damaged after review is never imported.
 * Downloads come from GitHub only (release assets or repository files).
 * New entries and updates are **reviewed** before they are merged, and an automatic check downloads every new or
-  changed mod and runs the same package rules the kit uses.
+  changed mod and runs the same package rules the kit uses. Only the account that posted a mod can post its updates
+  or take it off the list.
 * Installing a new version keeps the old one as a backup (`D5ModKit/state/mod_backups`).
 
-## Submit a mod
+## Post a mod
 
-1. In D5 Mod Kit: **Browse Mods › 📤 Share my mod…**. Pick the mod, fill in the version, your name, the kind of mod,
-   a one-line summary and a description, and press **Export package + entry**. You get the mod's `.zip` and its
-   list entry.
-2. Upload the `.zip` to GitHub:
-   * a release of a repository of yours (**Releases › Draft a new release**, attach the zip): the best place, and
-     the only one for zips over 25 MB, or
-   * a comment on your pull request (drag the zip into it; GitHub gives it a `github.com/user-attachments/...`
-     address).
+Everything happens in D5 Mod Kit (1.5.7 or newer):
 
-   Upload the file exactly as exported (the entry's checksum is that file's; a new export is a different file).
-   Paste its download address into **Share my mod…** and press **Set address**.
-3. Fork this repository. Add your entry to the `mods` list in `index.json`, and a picture as `previews/<uid>.png`
-   (the `uid` is in the entry; 16:9, about 640 × 360, under 1 MB).
-4. Open a pull request. The check runs on its own. A reviewer installs the mod and looks at it, then merges.
+1. **Browse Mods › 📤 Post my mod…**
+2. The first time, sign in with GitHub: the kit shows a short code, **Open GitHub** opens the page where you paste it
+   and press **Authorize**. You need a free GitHub account; that page lets you make one. Only once per PC.
+3. Pick your mod, give it a version, your name, its kind, a one-line summary, a description and a picture, tick
+   that it's your work, and press **📤 Post**.
 
-**An update** changes your existing entry (same `uid`): new `version`, `download`, `size`, `sha256` and `updated`.
-Players who have the mod see **⬆ Update** on the Browse Mods page.
+The kit uploads the mod, adds it to the list and sends it for review. **📬 My posts** shows whether it's waiting,
+published or declined (with the reviewer's reason). An **update** is the same mod posted again with a higher
+version: players who have it see **⬆ Update**. Only the account that posted a mod can post its updates.
+
+<details><summary>Without the kit (for people who know GitHub)</summary>
+
+Make the entry yourself (format below), upload the zip to a release of a repository of yours, add the entry to
+`index.json` and a picture as `previews/<uid>.png` in a fork, and open a pull request.
+</details>
 
 ### What gets listed
 
